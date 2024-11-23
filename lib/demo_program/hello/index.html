@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { 
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        button {
+            padding: 10px;
+            margin: 5px;
+            background-color: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #666;
+            padding: 8px 15px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="navigateBack()">返回</button>
+    <h2>Mini Program Demo</h2>
+    <button onclick="showToast()">Show Toast</button>
+    <button onclick="getDeviceInfo()">Get Device Info</button>
+    <div id="result"></div>
+
+    <script>
+        // 初始化 JSBridge
+        window.miniProgramBridge = {
+            callbacks: {},
+            callHandler: function(method, params, callback) {
+                const callbackId = Date.now().toString();
+                this.callbacks[callbackId] = callback;
+                FlutterBridge.postMessage(JSON.stringify({
+                    method: method,
+                    params: params,
+                    callback: callbackId
+                }));
+            },
+            callback: function(callbackId, result) {
+                if (this.callbacks[callbackId]) {
+                    this.callbacks[callbackId](result);
+                    delete this.callbacks[callbackId];
+                }
+            }
+        };
+
+        function showToast() {
+            window.miniProgramBridge.callHandler(
+                'showToast',
+                { message: 'Hello from Mini Program!' },
+                function(result) {
+                    console.log('Toast result:', result);
+                }
+            );
+        }
+
+        function getDeviceInfo() {
+            window.miniProgramBridge.callHandler(
+                'getDeviceInfo',
+                {},
+                function(result) {
+                    document.getElementById('result').innerHTML = 
+                        '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+                }
+            );
+        }
+
+        function navigateBack() {
+            window.miniProgramBridge.callHandler(
+                'navigateBack',
+                {},
+                function(result) {
+                    console.log('Navigate back result:', result);
+                }
+            );
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,16 @@
+name: my_mini_program
+description: A Flutter mini program demo
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.17.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  webview_flutter: ^4.7.0
+  path_provider: ^2.1.2
+  http: ^1.2.0
+  path: ^1.8.0
+  flutter_inappwebview: ^6.0.0
