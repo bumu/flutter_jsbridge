@@ -11,6 +11,13 @@ dependencies:
     sdk: flutter
   webview_flutter: ^4.7.0
   path_provider: ^2.1.2
-  http: ^1.2.0
+  http: ^1.1.0
   path: ^1.8.0
   flutter_inappwebview: ^6.0.0
+
+flutter:
+  assets:
+    - assets/
+    - assets/demo_program/
+    - assets/demo_program/hello/
+    - assets/demo_program/hello/index.html

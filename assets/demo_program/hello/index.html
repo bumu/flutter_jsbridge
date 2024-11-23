@@ -6,6 +6,11 @@
         body { 
             font-family: Arial, sans-serif;
             margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
         }
         button {
             padding: 10px;
@@ -15,25 +20,16 @@
             border: none;
             border-radius: 5px;
         }
-        .back-button {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background-color: #666;
-            padding: 8px 15px;
-            z-index: 100;
-        }
     </style>
 </head>
 <body>
-    <button class="back-button" onclick="navigateBack()">返回</button>
-    <h2>Mini Program Demo</h2>
-    <button onclick="showToast()">Show Toast</button>
-    <button onclick="getDeviceInfo()">Get Device Info</button>
+    <h1>Hello World</h1>
+    <button onclick="loadFile()">load mini program assets/ index.html</button>
+    <button onclick="loadRemoteFile()">load remote file</button>
+
     <div id="result"></div>
 
     <script>
-        // 初始化 JSBridge
         window.miniProgramBridge = {
             callbacks: {},
             callHandler: function(method, params, callback) {
@@ -53,33 +49,24 @@
             }
         };
 
-        function showToast() {
+        function loadFile() {
+            console.log('loadFile-----xx');
             window.miniProgramBridge.callHandler(
-                'showToast',
-                { message: 'Hello from Mini Program!' },
+                'loadLocalFile',
+                { path: 'assets/hello.txt' },
                 function(result) {
-                    console.log('Toast result:', result);
+                    document.getElementById('result').textContent = result.content;
                 }
             );
         }
 
-        function getDeviceInfo() {
+        function loadRemoteFile() {
+            console.log('loadRemoteFile-----');
             window.miniProgramBridge.callHandler(
-                'getDeviceInfo',
-                {},
+                'loadRemoteFile',
+                { url: 'http://oracle.airdb.host:8001/hello.txt' },
                 function(result) {
-                    document.getElementById('result').innerHTML = 
-                        '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
-                }
-            );
-        }
-
-        function navigateBack() {
-            window.miniProgramBridge.callHandler(
-                'navigateBack',
-                {},
-                function(result) {
-                    console.log('Navigate back result:', result);
+                    document.getElementById('result').textContent = result.content;
                 }
             );
         }

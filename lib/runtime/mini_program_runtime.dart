@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../bridge/js_bridge.dart';
 import '../bridge/bridge_methods.dart';
+import 'dart:convert';
 
 class MiniProgramRuntime extends StatefulWidget {
   final String appId;
@@ -23,12 +24,36 @@ class _MiniProgramRuntimeState extends State<MiniProgramRuntime> {
   @override
   void initState() {
     super.initState();
+    
+    // Format the asset path
+    final String assetPath = widget.programPath != null
+        ? widget.programPath!.trim()
+            .replaceAll('//', '/')
+            .replaceAll(RegExp('^/'), '') // Remove leading slash
+            .replaceAll(RegExp('/\$'), '') // Remove trailing slash
+        : 'index.html';
+
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadFlutterAsset(widget.programPath ?? 'lib/demo_program/hello/index.html');
+      ..addJavaScriptChannel(
+        'FlutterBridge',
+        onMessageReceived: (JavaScriptMessage message) {
+          final data = jsonDecode(message.message);
+          JSBridge.handleJSCall(data['method'], data['params']).then((result) {
+            JSBridge.callJS(data['callback'], result);
+          });
+        },
+      )
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageFinished: (String url) {
+            BridgeMethods.registerBasicMethods(context);
+          },
+        ),
+      )
+      ..loadFlutterAsset('assets/$assetPath');
     
-    JSBridge().initialize(_controller);
-    BridgeMethods.registerBasicMethods(context);
+    JSBridge.init(_controller);
   }
 
   @override
